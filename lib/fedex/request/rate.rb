@@ -66,7 +66,7 @@ module Fedex
             add_client_detail(xml)
             add_version(xml)
             add_transit_time(xml)
-            add_one_rate(xml)
+            add_one_rate(xml) if @shipping_options[:one_rate]
             add_requested_shipment(xml)
           }
         end
