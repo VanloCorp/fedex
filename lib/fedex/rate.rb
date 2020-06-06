@@ -24,7 +24,6 @@ module Fedex
       @transit_time = options[:transit_time]
       @rate_type = options[:rate_type]
       @rate_zone = options[:rate_zone]
-      @total_billing_weight = "#{options[:total_billing_weight][:value]} #{options[:total_billing_weight][:units]}"
       @total_freight_discounts = options[:total_freight_discounts]
       @total_net_charge = options[:total_net_charge][:amount]
       @total_taxes = options[:total_taxes][:amount]
@@ -33,6 +32,12 @@ module Fedex
       @total_base_charge = options[:total_base_charge][:amount]
       @total_net_fedex_charge = (options[:total_net_fe_dex_charge]||{})[:amount]
       @total_rebates = (options[:total_rebates]||{})[:amount]
+
+      if options[:special_rating_applied] == "FEDEX_ONE_RATE"
+        @total_billing_weight = "FEDEX ONE RATE"
+      else
+        @total_billing_weight = "#{options[:total_billing_weight][:value]} #{options[:total_billing_weight][:units]}" if options[:total_billing_weight]
+      end
     end
   end
 end

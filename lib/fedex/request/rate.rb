@@ -40,7 +40,7 @@ module Fedex
           add_recipient(xml)
           add_shipping_charges_payment(xml)
           add_customs_clearance(xml) if @customs_clearance_detail
-          xml.RateRequestTypes "ACCOUNT"
+          xml.RateRequestTypes "NONE"
           add_packages(xml)
         }
       end
@@ -48,6 +48,13 @@ module Fedex
       # Add transite time options
       def add_transit_time(xml)
         xml.ReturnTransitAndCommit true
+      end
+
+      # Add fetching fedex one-rate options when available
+      # note: will create "duplicate" rate records for service levels that
+      # have available one-rates
+      def add_one_rate(xml)
+        xml.VariableOptions 'FEDEX_ONE_RATE'
       end
 
       # Build xml Fedex Web Service request
@@ -59,6 +66,7 @@ module Fedex
             add_client_detail(xml)
             add_version(xml)
             add_transit_time(xml)
+            add_one_rate(xml)
             add_requested_shipment(xml)
           }
         end
