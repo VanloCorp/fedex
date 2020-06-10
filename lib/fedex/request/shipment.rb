@@ -24,6 +24,7 @@ module Fedex
       # e.g. response_details[:completed_shipment_detail][:completed_package_details][:tracking_ids][:tracking_number]
       def process_request
         api_response = self.class.post api_url, :body => build_xml
+        puts build_xml if @debug
         puts api_response if @debug
         response = parse_response(api_response)
         if success?(response)
@@ -94,33 +95,6 @@ module Fedex
                 xml.CountryCode @label_specification[:printed_label_origin][:address][:country_code]
               }
             }
-          end
-        }
-      end
-
-      def add_special_services(xml)
-        xml.SpecialServicesRequested {
-          if @shipping_options[:return_reason]
-            xml.SpecialServiceTypes "RETURN_SHIPMENT"
-            xml.ReturnShipmentDetail {
-              xml.ReturnType "PRINT_RETURN_LABEL"
-              xml.Rma {
-                xml.Reason "#{@shipping_options[:return_reason]}"
-              }
-            }
-          end
-          if @shipping_options[:cod]
-            xml.SpecialServiceTypes "COD"
-            xml.CodDetail {
-              xml.CodCollectionAmount {
-                xml.Currency @shipping_options[:cod][:currency].upcase if @shipping_options[:cod][:currency]
-                xml.Amount @shipping_options[:cod][:amount] if @shipping_options[:cod][:amount]
-              }
-              xml.CollectionType @shipping_options[:cod][:collection_type] if @shipping_options[:cod][:collection_type]
-            }
-          end
-          if @shipping_options[:saturday_delivery]
-            xml.SpecialServiceTypes "SATURDAY_DELIVERY"
           end
         }
       end
