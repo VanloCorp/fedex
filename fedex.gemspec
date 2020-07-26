@@ -20,10 +20,12 @@ Gem::Specification.new do |s|
   s.add_dependency 'nokogiri',            '>= 1.5.6'
 
   s.add_development_dependency "rspec",   '~> 3.1'
-  s.add_development_dependency 'vcr',     '~> 2.0'
-  s.add_development_dependency 'webmock', '~> 1.8.0'
+  s.add_development_dependency 'vcr',     '~> 6.0'
+  s.add_development_dependency 'webmock', '~> 3.8.0'
+  s.add_development_dependency 'byebug'
   s.add_development_dependency 'pry'
   s.add_development_dependency 'rake'
+  s.add_development_dependency 'debase'
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")

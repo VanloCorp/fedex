@@ -53,8 +53,8 @@ module Fedex
         @shipper, @recipient, @packages, @service_type, @customs_clearance_detail, @debug = options[:shipper], options[:recipient], options[:packages], options[:service_type], options[:customs_clearance_detail], options[:debug]
         @origin = options[:origin]
         @debug ||= ENV['DEBUG'] == 'true'
-        @shipping_options =  options[:shipping_options] ||={}
-        @payment_options = options[:payment_options] ||={}
+        @shipping_options =  options[:shipping_options] ||= {}
+        @payment_options = options[:payment_options] ||= {}
         requires!(@payment_options, :type, :account_number, :name, :company, :phone_number, :country_code) if @payment_options.length > 0
         if options.has_key?(:mps)
           @mps = options[:mps]

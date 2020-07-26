@@ -5,14 +5,14 @@ module Fedex
     class Shipment < Base
       attr_reader :response_details
 
-      def initialize(credentials, options={})
+      def initialize(credentials, options = {})
         super
         requires!(options, :service_type)
         # Label specification is required even if we're not using it.
         @label_specification = {
-          :label_format_type => 'COMMON2D',
-          :image_type => 'PDF',
-          :label_stock_type => 'PAPER_LETTER'
+          label_format_type: 'COMMON2D',
+          image_type: 'PDF',
+          label_stock_type: 'PAPER_LETTER'
         }
         @label_specification.merge! options[:label_specification] if options[:label_specification]
         @customer_specified_detail = options[:customer_specified_detail] if options[:customer_specified_detail]
@@ -23,7 +23,7 @@ module Fedex
       # The parsed Fedex response is available in #response_details
       # e.g. response_details[:completed_shipment_detail][:completed_package_details][:tracking_ids][:tracking_number]
       def process_request
-        api_response = self.class.post api_url, :body => build_xml
+        api_response = self.class.post api_url, body: build_xml
         puts build_xml if @debug
         puts api_response if @debug
         response = parse_response(api_response)
@@ -40,18 +40,19 @@ module Fedex
       def add_requested_shipment(xml)
         xml.RequestedShipment{
           xml.ShipTimestamp @shipping_options[:ship_timestamp] ||= Time.now.utc.iso8601(2)
-          xml.DropoffType @shipping_options[:drop_off_type] ||= "REGULAR_PICKUP"
+          xml.DropoffType @shipping_options[:drop_off_type] ||= 'REGULAR_PICKUP'
           xml.ServiceType service_type
-          xml.PackagingType @shipping_options[:packaging_type] ||= "YOUR_PACKAGING"
+          xml.PackagingType @shipping_options[:packaging_type] ||= 'YOUR_PACKAGING'
           add_total_weight(xml) if @mps.has_key? :total_weight
           add_shipper(xml)
           add_origin(xml) if @origin
           add_recipient(xml)
           add_shipping_charges_payment(xml)
+          add_smart_post_details(xml) if @service_type == 'SMART_POST'
           add_special_services(xml) if @shipping_options[:return_reason] || @shipping_options[:cod] || @shipping_options[:saturday_delivery]
           add_customs_clearance(xml) if @customs_clearance_detail
           add_custom_components(xml)
-          xml.RateRequestTypes "ACCOUNT"
+          xml.RateRequestTypes 'ACCOUNT'
           add_packages(xml)
         }
       end
@@ -62,6 +63,15 @@ module Fedex
             xml.Units @mps[:total_weight][:units]
             xml.Value @mps[:total_weight][:value]
           }
+        end
+      end
+
+      def add_smart_post_details(xml)
+        xml.SmartPostDetail do
+          xml.Indicia @shipping_options[:indicia]
+          xml.AncillaryEndorsement @shipping_options[:ancillary_endorsement]
+          xml.HubId @shipping_options[:hub_id]
+          xml.CustomerManifestId @shipping_options[:customer_manifest_id] if @shipping_options[:customer_manifest_id]
         end
       end
 
@@ -128,13 +138,13 @@ module Fedex
       end
 
       def service
-        { :id => 'ship', :version => Fedex::API_VERSION }
+        { id: 'ship', version: Fedex::API_VERSION }
       end
 
       # Successful request
       def success?(response)
         response[:process_shipment_reply] &&
-          %w{SUCCESS WARNING NOTE}.include?(response[:process_shipment_reply][:highest_severity])
+          %w[SUCCESS WARNING NOTE].include?(response[:process_shipment_reply][:highest_severity])
       end
 
     end

@@ -11,7 +11,7 @@ module Fedex
         requires!(options, :package_type, :package_id) unless options.has_key?(:tracking_number)
 
         @package_id   = options[:package_id]   || options.delete(:tracking_number)
-        @package_type = options[:package_type] || "TRACKING_NUMBER_OR_DOORTAG"
+        @package_type = options[:package_type] || 'TRACKING_NUMBER_OR_DOORTAG'
         @credentials  = credentials
 
         # Optional
@@ -64,7 +64,7 @@ module Fedex
             add_client_detail(xml)
             add_version(xml)
             add_package_identifier(xml)
-            xml.TrackingNumberUniqueIdentifier @uuid         if @uuid
+            xml.TrackingNumberUniqueIdentifier @uuid if @uuid
             xml.IncludeDetailedScans           @include_detailed_scans
             xml.PagingToken                    @paging_token if @paging_token
           }
@@ -73,7 +73,7 @@ module Fedex
       end
 
       def service
-        { :id => 'trck', :version => 6 }
+        { id: 'trck', version: 6 }
       end
 
       def add_package_identifier(xml)
@@ -86,7 +86,7 @@ module Fedex
       # Successful request
       def success?(response)
         response[:track_reply] &&
-          %w{SUCCESS WARNING NOTE}.include?(response[:track_reply][:highest_severity])
+          %w[SUCCESS WARNING NOTE].include?(response[:track_reply][:highest_severity])
       end
 
       def package_type_valid?
