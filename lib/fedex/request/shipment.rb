@@ -36,7 +36,6 @@ module Fedex
 
       private
 
-      # Add information for shipments
       def add_requested_shipment(xml)
         xml.RequestedShipment{
           xml.ShipTimestamp @shipping_options[:ship_timestamp] ||= Time.now.utc.iso8601(2)
@@ -48,10 +47,10 @@ module Fedex
           add_origin(xml) if @origin
           add_recipient(xml)
           add_shipping_charges_payment(xml)
-          add_smart_post_details(xml) if @service_type == 'SMART_POST'
-          add_custom_components(xml)
           add_special_services(xml) if @shipping_options[:return_reason] || @shipping_options[:cod] || @shipping_options[:saturday_delivery]
           add_customs_clearance(xml) if @customs_clearance_detail
+          add_custom_components(xml)
+          add_smart_post_details(xml) if @service_type == 'SMART_POST'
           xml.RateRequestTypes 'ACCOUNT'
           add_packages(xml)
         }
