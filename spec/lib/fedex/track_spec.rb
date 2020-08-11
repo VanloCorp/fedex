@@ -4,10 +4,10 @@ module Fedex
   describe TrackingInformation do
     let(:fedex) { Shipment.new(fedex_credentials) }
 
-    context 'shipments with tracking number', :vcr_with_shipment do
+    context 'shipments with tracking number', :vcr do
       let(:options) do
         {
-          package_id: @tn,
+          package_id: '123456789012',
           package_type: 'TRACKING_NUMBER_OR_DOORTAG',
           include_detailed_scans: true
         }
@@ -16,7 +16,7 @@ module Fedex
       let(:uuid) { fedex.track(options).first.unique_tracking_number }
 
       it 'returns an array of tracking information results' do
-        results = fedex.track(options.merge({ package_id: @tn }))
+        results = fedex.track(options.merge({ package_id: '123456789012' }))
         expect(results).not_to be_empty
       end
 
@@ -50,10 +50,10 @@ module Fedex
 
     end
 
-    context 'duplicate shipments with same tracking number', :vcr_with_shipment do
+    context 'duplicate shipments with same tracking number', :vcr do
       let(:options) do
         {
-          package_id: @tn,
+          package_id: '123456789012',
           package_type: 'TRACKING_NUMBER_OR_DOORTAG',
           include_detailed_scans: true
         }
