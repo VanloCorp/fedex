@@ -42,7 +42,7 @@ module Fedex
           add_shipping_charges_payment(xml)
           add_special_services(xml) if @shipping_options[:return_reason] || @shipping_options[:cod] || @shipping_options[:saturday_delivery]
           add_customs_clearance(xml) if @customs_clearance_detail
-          add_smartpost_detail(xml) if @smartpost_detail
+          add_smart_post_detail(xml) if @shipping_options[:hub_id]
           xml.RateRequestTypes "NONE"
           add_packages(xml)
         }

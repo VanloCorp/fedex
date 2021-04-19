@@ -49,7 +49,7 @@ module Fedex
           add_shipping_charges_payment(xml)
           add_special_services(xml) if @shipping_options[:return_reason] || @shipping_options[:cod] || @shipping_options[:saturday_delivery]
           add_customs_clearance(xml) if @customs_clearance_detail
-          add_smart_post_details(xml) if @service_type == 'SMART_POST'
+          add_smart_post_detail(xml) if @service_type == 'SMART_POST'
           add_custom_components(xml)
           xml.RateRequestTypes 'ACCOUNT'
           add_packages(xml)
@@ -62,15 +62,6 @@ module Fedex
             xml.Units @mps[:total_weight][:units]
             xml.Value @mps[:total_weight][:value]
           }
-        end
-      end
-
-      def add_smart_post_details(xml)
-        xml.SmartPostDetail do
-          xml.Indicia @shipping_options[:indicia]
-          xml.AncillaryEndorsement @shipping_options[:ancillary_endorsement]
-          xml.HubId @shipping_options[:hub_id]
-          xml.CustomerManifestId @shipping_options[:customer_manifest_id] if @shipping_options[:customer_manifest_id]
         end
       end
 

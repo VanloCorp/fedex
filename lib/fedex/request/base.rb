@@ -50,7 +50,7 @@ module Fedex
       def initialize(credentials, options={})
         requires!(options, :shipper, :recipient, :packages)
         @credentials = credentials
-        @shipper, @recipient, @packages, @service_type, @customs_clearance_detail, @smartpost_detail, @debug = options[:shipper], options[:recipient], options[:packages], options[:service_type], options[:customs_clearance_detail], options[:smartpost_detail], options[:debug]
+        @shipper, @recipient, @packages, @service_type, @customs_clearance_detail, @debug = options[:shipper], options[:recipient], options[:packages], options[:service_type], options[:customs_clearance_detail], options[:debug]
         @origin = options[:origin]
         @debug ||= ENV['DEBUG'] == 'true'
         @shipping_options =  options[:shipping_options] ||= {}
@@ -360,10 +360,13 @@ module Fedex
       end
 
       # Add smartpost specific details
-      def add_smartpost_detail(xml)
-        xml.SmartPostDetail{
-          hash_to_xml(xml, @smartpost_detail)
-        }
+      def add_smart_post_detail(xml)
+        xml.SmartPostDetail do
+          xml.Indicia @shipping_options[:indicia]
+          xml.AncillaryEndorsement @shipping_options[:ancillary_endorsement] if @shipping_options[:ancillary_endorsement]
+          xml.HubId @shipping_options[:hub_id]
+          xml.CustomerManifestId @shipping_options[:customer_manifest_id] if @shipping_options[:customer_manifest_id]
+        end
       end
 
       # Fedex Web Service Api
