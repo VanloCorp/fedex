@@ -359,6 +359,13 @@ module Fedex
         }
       end
 
+      # Add smartpost specific details
+      def add_smartpost_detail(xml)
+        xml.SmartPostDetail{
+          hash_to_xml(xml, @smartpost_detail)
+        }
+      end
+
       # Fedex Web Service Api
       def api_url
         @credentials.mode == "production" ? PRODUCTION_URL : TEST_URL
