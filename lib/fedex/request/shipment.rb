@@ -25,7 +25,7 @@ module Fedex
       def process_request
         api_response = self.class.post api_url, body: build_xml
         puts build_xml if @debug
-        puts api_response if @debug
+        puts api_response.body.encode!('UTF-8', undef: :replace) if @debug
         response = parse_response(api_response)
         if success?(response)
           success_response(api_response, response)

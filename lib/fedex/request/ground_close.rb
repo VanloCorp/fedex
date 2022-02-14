@@ -5,20 +5,24 @@ module Fedex
   module Request
     class GroundClose < Base
 
-      attr_reader :up_to_time, :filename
+      attr_reader :up_to_time, :references, :filename
 
       def initialize(credentials, options={})
-        requires!(options, :up_to_time)
+        # requires!(options, :up_to_time)
 
         @credentials = credentials
+        # it's either up_to_time or references
         @up_to_time = options[:up_to_time]
+        @references = options[:references]
+
         @filename = options[:filename]
         @debug = ENV['DEBUG'] == 'true'
       end
 
       def process_request
+        puts build_xml if @debug == true
         api_response = self.class.post(api_url, :body => build_xml)
-        puts api_response if @debug == true
+        puts api_response.body.encode!('UTF-8', undef: :replace) if @debug == true
         response = parse_response(api_response)
         if success?(response)
           success_response(response)
@@ -48,19 +52,39 @@ module Fedex
       # Build xml Fedex Web Service request
       def build_xml
         builder = Nokogiri::XML::Builder.new do |xml|
-          xml.GroundCloseRequest(:xmlns => "http://fedex.com/ws/close/v2"){
+          #xml.CloseWithDocumentsRequest(:xmlns => "http://fedex.com/ws/close/v5"){
+          xml.GroundCloseRequest(:xmlns => "http://fedex.com/ws/close/v5"){
             add_web_authentication_detail(xml)
             add_client_detail(xml)
             add_version(xml)
 
-            xml.TimeUpToWhichShipmentsAreToBeClosed up_to_time.utc.iso8601(2)
+            if references
+              xml.CloseGrouping('MANIFEST_REFERENCE')
+              references.each do |value|
+                xml.ManifestReferenceDetail {
+                  xml.Type('CUSTOMER_REFERENCE')
+                  xml.Value(value)
+                }
+              end
+            elsif up_to_time
+              xml.TimeUpToWhichShipmentsAreToBeClosed(up_to_time.utc.iso8601.chop)
+            end
+
+            #xml.ActionType('CLOSE')
+            #xml.CarrierCode('FDXE')
+            # xml.ProcessingOptions {
+            #   xml.Options('ERROR_IF_OPEN_SHIPMENTS_FOUND')
+            # }
+            # xml.CloseDocumentSpecification {
+            #   xml.CloseDocumentTypes('MANIFEST')
+            # }
           }
         end
         builder.doc.root.to_xml
       end
 
       def service
-        { :id => 'clos', :version => '2' }
+        { :id => 'clos', :version => '5' }
       end
 
       # Successful request

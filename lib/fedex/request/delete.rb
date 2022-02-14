@@ -12,11 +12,14 @@ module Fedex
         @tracking_number  = options[:tracking_number]
         @deletion_control = options[:deletion_control] || 'DELETE_ALL_PACKAGES'
         @credentials  = credentials
+        
+        @debug = ENV['DEBUG'] == 'true'
       end
 
       def process_request
+        puts build_xml if @debug == true
         api_response = self.class.post(api_url, :body => build_xml)
-        puts api_response if @debug == true
+        puts api_response.body.encode!('UTF-8', undef: :replace) if @debug == true
         response = parse_response(api_response)
         unless success?(response)
           error_message = if response[:shipment_reply]
