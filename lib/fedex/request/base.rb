@@ -230,8 +230,13 @@ module Fedex
           if @shipping_options[:saturday_delivery]
             xml.SpecialServiceTypes "SATURDAY_DELIVERY"
           end
+          if @shipping_options[:one_rate]
+            xml.SpecialServiceTypes "FEDEX_ONE_RATE"
+          end
         }
       end
+
+      
 
       # Add Master Tracking Id (for MPS Shipping Labels, this is required when requesting labels 2 through n)
       def add_master_tracking_id(xml)
