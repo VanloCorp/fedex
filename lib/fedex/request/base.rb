@@ -206,7 +206,7 @@ module Fedex
         }
       end
 
-      def add_special_services(xml)
+      def add_special_services(xml, label=false)
         xml.SpecialServicesRequested {
           if @shipping_options[:return_reason]
             xml.SpecialServiceTypes "RETURN_SHIPMENT"
@@ -230,7 +230,7 @@ module Fedex
           if @shipping_options[:saturday_delivery]
             xml.SpecialServiceTypes "SATURDAY_DELIVERY"
           end
-          if @shipping_options[:one_rate]
+          if @shipping_options[:one_rate] && label
             xml.SpecialServiceTypes "FEDEX_ONE_RATE"
           end
         }
